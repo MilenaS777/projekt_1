@@ -40,63 +40,52 @@ garpike and stingray are also present.'''
 
 # Funkce pro analýzu textu
 def analyza_textu(text):
-    # Počet slov
-    pocet_slov = len(text.split())
-    # Počet slov začínajících velkým písmenem
-    slova_velka_pismena = sum(1 for slovo in text.split() if slovo[0].isupper())
-    # Počet slov psaných velkými písmeny
-    slova_velkymi_pismeny = sum(1 for slovo in text.split() if slovo.isupper())
-    # Počet slov psaných malými písmeny
-    slova_malymi_pismeny = sum(1 for slovo in text.split() if slovo.islower())
-    # Počet čísel a suma čísel v textu
-    cisla = [int(word) for word in text.split() if word.isdigit()]
-    pocet_cisel = len(cisla)
-    suma_cisel = sum(cisla)
 
-    # Délka slov, četnost výskytu
-    cetnost_delky_slov = {}
-    for slovo in text.split():
-      slovo = slovo.strip(",.!?")
-      delka_slova = len(slovo)
-      cetnost_delky_slov[delka_slova] = cetnost_delky_slov.get(delka_slova, 0) + 1
-      # Setřídění slovníku podle klíčů
-      cetnost_delky_slov = dict(sorted(cetnost_delky_slov.items()))
+  slova = [word.strip(',.?!') for word in text.split()]   # Rozdělí text na jednotlivá slova, odstraní nepotřebné znaky.
+  slova_zacinajici_velkym = [slovo for slovo in slova if slovo.istitle()] # Najde všechna slova psaná s prvním velkým písmenem.
+  slova_velkymi_pismeny = re.findall(r'\b[A-Z]+\b', text)  # Najde všechna slova psaná velkými písmeny.
+  slova_malymi_pismeny = [slovo for slovo in slova if slovo.islower()]  # Najde všechna slova psaná malými písmeny.
+  cisla = re.findall(r'\b\d+\b', text)    # Najde čísla v textu.
 
+  delky_slov = [len(slovo) for slovo in slova]    # Zjistí délku jednotlivých slov v textu.
+  cetnost_delky_slov = Counter(delky_slov)    # Zjistí četnost délky jednotlivých slov.
 
-    # Výsledky analýzy
-    print("Počet slov:", pocet_slov)
-    print("Počet slov začínajících velkým písmenem:", slova_velka_pismena)
-    print("Počet slov psaných velkými písmeny:", slova_velkymi_pismeny)
-    print("Počet slov psaných malými písmeny:", slova_malymi_pismeny)
-    print("Počet čísel:", pocet_cisel)
-    print("Suma všech čísel:", suma_cisel)
-    print("-"*35)
-    print("LEN"," |", "OCCURENCE", "\t| NR")
-    print("-"*35)
-    print()
-    for delka, cetnost in cetnost_delky_slov.items():
-        print(delka, "|", "*"*cetnost, "|", cetnost, end='\n')
+  # Tisk slov a čísel, výpočet počtů.
+  print(f"Ve vybraném textu je {len(slova)} slov.")   # Počet slov = len(slova)
+  print(f"Počet slov začínajícíh velkým písmenem je: {len(slova_zacinajici_velkym)}")   # Počet slov začínající velkými písmeny.
+  print(f"Počet slov psaných velkými písmeny je: {sum(1 for slovo in slova_velkymi_pismeny if slovo.isalpha())}") # Zkontroluje, že slovo obsahuje pouze písmena
+  print(f"Počet slov psaných malými písmeny je: {len(slova_malymi_pismeny)}")   # Počet slov malými písmeny.
+  print(f"Počet nalezených čísel v textu: {len(cisla)}")    # počet čísel = len(cisla)
+  print(f"Součet nalezených čísel v textu: {sum(int(cislo) for cislo in cisla)}")  # součet_cisel = sum(int(cislo) for cislo in cisla)
+  print("-"*35)
+  print(f"LEN |   OCCURENCES      | NR.")
+  print("-"*35)
+  for delka, cetnost in sorted(cetnost_delky_slov.items()):
+      print(f" {delka: ^2} |{'*' * cetnost:<18} |{cetnost: ^2}")
 
+# Ověření, zda zadané jméno a heslo odpovídají registrovaným uživatelům.
+def over_jmeno_a_heslo(jmeno, heslo):
 
-jmeno = input("Zadejte přihlašovací jméno: ")
+  if jmeno in reg_uzivatele and reg_uzivatele[jmeno] == heslo:
+    return True
+  else:
+    return False
+
+jmeno = input("Zadejte přihlašovací jméno: ") 
 heslo = input("Zadejte heslo: ")
 
-if jmeno in reg_uzivatele and reg_uzivatele[jmeno] == heslo:
+if over_jmeno_a_heslo(jmeno, heslo):
   print("Přihlášení úspěšné. Vítejte,", jmeno)
+  print(f"Jsou na výběr {len(TEXTS)} texty k analýze.")
+  
+  volba = input("Zadejte celé číslo od 1 do 3, pro výběr textu k analýze: ")
+  while not volba.isdigit() or int(volba) not in range(1, 4):
+    print(f"Nebylo zvoleno číslo 1 - 3, ukončuji program.")
+    quit()
+  text = TEXTS[int(volba) - 1]
+  print("Zvolil jste cislo:", volba, ",proběhne analýza textu.")
+  analyza_textu(text)  
 
-  dotazovani = True
-  while dotazovani:
-    volba = input("Zadejte celé číslo od 1 do 3, pro výběr textu k analýze: ")
-    if volba.isnumeric() and int(volba) in range(1, 4):
-        print("Zvolil jste cislo:", volba, "proběhne analýza textu")
-        text = TEXTS[int(volba) - 1]
-
-        analyza_textu(text)
-
-        break
-    else:
-      print("Nebylo zvoleno číslo 1 - 3, ukončuji program")
-      break
-else:
-  print("Chybné přihlašovací jméno nebo heslo. Ukončuji program.")
-  exit()
+else: print("Chybné přihlašovací jméno nebo heslo. Ukončuji program.")
+quit()
+    
