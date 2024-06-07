@@ -3,6 +3,13 @@
 #email: 1.milena.sedlarova@gmail.com
 #discord: milenas_133
 
+
+#Import knihoven:
+import sys
+import re
+from collections import Counter
+
+#Registrovaní uživatelé a jejich přihlašovací údaje:
 reg_uzivatele = {
                   "bob": "123",
                   "ann": "pass123",
@@ -10,6 +17,7 @@ reg_uzivatele = {
                   "liz": "pass123"
                   }
 
+#Text k výběru a analýze:
 TEXTS = ['''
 Situated about 10 miles west of Kemmerer,
 Fossil Butte is a ruggedly impressive
@@ -38,7 +46,7 @@ in modern oceans. Other fish such as paddlefish,
 garpike and stingray are also present.'''
 ]
 
-# Funkce pro analýzu textu
+# Funkce pro analýzu textu:
 def analyza_textu(text):
 
   slova = [word.strip(',.?!') for word in text.split()]   # Rozdělí text na jednotlivá slova, odstraní nepotřebné znaky.
@@ -71,21 +79,33 @@ def over_jmeno_a_heslo(jmeno, heslo):
   else:
     return False
 
-jmeno = input("Zadejte přihlašovací jméno: ") 
-heslo = input("Zadejte heslo: ")
+# hlavní funkce
+def main():
+    jmeno = input("Zadejte přihlašovací jméno: ")
+    heslo = input("Zadejte heslo: ")
 
-if over_jmeno_a_heslo(jmeno, heslo):
-  print("Přihlášení úspěšné. Vítejte,", jmeno)
-  print(f"Jsou na výběr {len(TEXTS)} texty k analýze.")
-  
-  volba = input("Zadejte celé číslo od 1 do 3, pro výběr textu k analýze: ")
-  while not volba.isdigit() or int(volba) not in range(1, 4):
-    print(f"Nebylo zvoleno číslo 1 - 3, ukončuji program.")
-    quit()
-  text = TEXTS[int(volba) - 1]
-  print("Zvolil jste cislo:", volba, ",proběhne analýza textu.")
-  analyza_textu(text)  
+    if over_jmeno_a_heslo(jmeno, heslo):
+        print("Přihlášení úspěšné. Vítejte,", jmeno)
+        print(f"Můžete si vybrat text k analýze.")
+        
+        try:
+            volba = int(input(f"Zadejte číslo textu k analýze (1-{len(TEXTS)}): "))
+            if volba < 1 or volba > len(TEXTS):
+                print("Neplatná volba. Ukončuji program.")
+                sys.exit()
 
-else: print("Chybné přihlašovací jméno nebo heslo. Ukončuji program.")
-quit()
+            text = TEXTS[volba - 1]
+            analyza_textu(text)
+            
+        except ValueError:
+            print("Neplatný vstup. Ukončuji program.")
+            sys.exit()  
+
+    else:
+        print("Chybné přihlašovací jméno nebo heslo, ukončuji program.")
+        sys.exit()  
+
+if __name__ == "__main__":
+    main()
+
     
