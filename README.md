@@ -12,3 +12,4 @@ Program zobrazí jednoduchý sloupcový graf, který bude reprezentovat četnost
   Tento program využívá ke své funkci knihovny Python: 
 re ;
 collections
+a sys.
